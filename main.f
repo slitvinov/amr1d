@@ -1,4 +1,3 @@
-      program AMRID
       parameter(mpoin=40000,melem=80000,period=0.0)
       integer intmat(melem,2)
       real xp(mpoin),ce(melem,2),rmatm(mpoin),rlen(melem)
