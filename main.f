@@ -18,7 +18,6 @@
       write(fname,'(I7.7)') i
       fname = fname(1:7)//'.dat'
       open(50, file=fname, status='unknown')
-
       call init(gamma,cour,ntime,di,ctore,ctode,epsil,nrmax,
      &     nbuff,ntref,npoin,nelem,mpoin,melem,period,
      &     intmat, mrhist, irefe, idere, ipact,
