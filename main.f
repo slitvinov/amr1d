@@ -100,7 +100,7 @@
             end do
          end if
       end do
- 6    format (5(2x, e12.5))      
+ 6    format (5(2x, e12.5), 2x, i6)
       end
 
       subroutine init(gamma,cour,ntime,di,ctore,ctode,epsil,nrmax,
