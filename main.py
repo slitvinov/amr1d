@@ -69,8 +69,8 @@ def grerror(vref):
     nelem = g.nelem
     melem = g.melem
     mpoin = g.mpoin
-    ibdry_l = getattr(g, "ibdry_l", 1)
-    ibdry_r = getattr(g, "ibdry_r", g.npoin)
+    ibdry_l = g.ibdry_l
+    ibdry_r = g.ibdry_r
 
     # zero/clear
     for ie in range(1, melem + 1):
