@@ -213,11 +213,11 @@ def refine():
             mid = 0.5 * (g.xp[g.intmat[ie][1]] + g.xp[g.intmat[ie][2]])
             g.xp[g.npoin] = mid
             g.rho[g.npoin] = 0.5 * (g.rho[g.intmat[ie][1]] +
-                                  g.rho[g.intmat[ie][2]])
+                                    g.rho[g.intmat[ie][2]])
             g.rhov[g.npoin] = 0.5 * (g.rhov[g.intmat[ie][1]] +
-                                   g.rhov[g.intmat[ie][2]])
+                                     g.rhov[g.intmat[ie][2]])
             g.rhoE[g.npoin] = 0.5 * (g.rhoE[g.intmat[ie][1]] +
-                                   g.rhoE[g.intmat[ie][2]])
+                                     g.rhoE[g.intmat[ie][2]])
 
             # split element
             g.intmat[g.nelem + 1][1] = g.intmat[ie][1]
@@ -238,33 +238,6 @@ def refine():
 
             g.nelem += 2
         ie += 1
-
-
-def fluxld():
-    npoin = g.npoin
-    nelem = g.nelem
-    cbig = 1.0e30
-
-    for ip in range(1, npoin + 1):
-        if g.ipact[ip] == 1:
-            g.v[ip] = g.rhov[ip] / g.rho[ip]
-            g.p[ip] = g.gammal * (g.rhoE[ip] - 0.5 * g.rhov[ip] * g.v[ip])
-            g.flux[ip][1] = g.rhov[ip]
-            g.flux[ip][2] = g.rhov[ip] * g.v[ip] + g.p[ip]
-            g.flux[ip][3] = g.rhoE[ip] * g.v[ip] + g.p[ip] * g.v[ip]
-
-    for ip in range(1, npoin + 1):
-        if g.ipact[ip] == 1:
-            g.vmax[ip] = math.sqrt(g.gamma * g.p[ip] / g.rho[ip]) + abs(
-                g.v[ip])
-
-    dt = cbig
-    for ie in range(1, nelem + 1):
-        if g.mrhist[ie][5] == 1:
-            for inn in (1, 2):
-                node = g.intmat[ie][inn]
-                dt = min(dt, g.rlen[ie] / g.vmax[node])
-    g.dt = g.cour * dt
 
 
 def deltau():
@@ -443,7 +416,30 @@ for it in range(1, g.ntime + 1):
         refine()
         geom()
 
-    fluxld()
+    npoin = g.npoin
+    nelem = g.nelem
+    cbig = 1.0e30
+
+    for ip in range(1, npoin + 1):
+        if g.ipact[ip] == 1:
+            g.v[ip] = g.rhov[ip] / g.rho[ip]
+            g.p[ip] = g.gammal * (g.rhoE[ip] - 0.5 * g.rhov[ip] * g.v[ip])
+            g.flux[ip][1] = g.rhov[ip]
+            g.flux[ip][2] = g.rhov[ip] * g.v[ip] + g.p[ip]
+            g.flux[ip][3] = g.rhoE[ip] * g.v[ip] + g.p[ip] * g.v[ip]
+
+    for ip in range(1, npoin + 1):
+        if g.ipact[ip] == 1:
+            g.vmax[ip] = math.sqrt(g.gamma * g.p[ip] / g.rho[ip]) + abs(
+                g.v[ip])
+
+    dt = cbig
+    for ie in range(1, nelem + 1):
+        if g.mrhist[ie][5] == 1:
+            for inn in (1, 2):
+                node = g.intmat[ie][inn]
+                dt = min(dt, g.rlen[ie] / g.vmax[node])
+    g.dt = g.cour * dt
     deltau()
 
     # BC (non-periodic → zero momentum increments at ends)
