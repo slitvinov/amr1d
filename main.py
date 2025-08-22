@@ -240,56 +240,6 @@ def refine():
         ie += 1
 
 
-def deltau():
-    npoin = g.npoin
-    nelem = g.nelem
-    cbig = 1.0e20
-    csmall = -1.0e20
-
-    for im in (1, 2, 3):
-        for ie in range(1, nelem + 1):
-            g.du[ie][im] = 0.0
-            g.diff[ie][im] = 0.0
-
-    rlmin = cbig
-    rlmax = csmall
-    for ie in range(1, nelem + 1):
-        if g.mrhist[ie][5] == 1 and g.rlen[ie] < rlmin:
-            rlmin = g.rlen[ie]
-        if g.mrhist[ie][5] == 1 and g.rlen[ie] > rlmax:
-            rlmax = g.rlen[ie]
-
-    for im in (1, 2, 3):
-        for ip in range(1, npoin + 1):
-            g.dup[ip][im] = 0.0
-
-    for ie in range(1, nelem + 1):
-        if g.mrhist[ie][5] == 1:
-            for im in (1, 2, 3):
-                du_ie = 0.0
-                for inn in (1, 2):
-                    du_ie += g.ce[ie][inn] * g.flux[g.intmat[ie][inn]][im]
-                g.du[ie][im] = du_ie
-
-            vv = max(g.vmax[g.intmat[ie][1]], g.vmax[g.intmat[ie][2]])
-            g.diff[ie][1] = g.ce[ie][1] * g.rho[g.intmat[ie][1]] * vv + g.ce[
-                ie][2] * g.rho[g.intmat[ie][2]] * vv
-            g.diff[ie][2] = g.ce[ie][1] * g.rhov[g.intmat[ie][1]] * vv + g.ce[
-                ie][2] * g.rhov[g.intmat[ie][2]] * vv
-            g.diff[ie][3] = g.ce[ie][1] * g.rhoE[g.intmat[ie][1]] * vv + g.ce[
-                ie][2] * g.rhoE[g.intmat[ie][2]] * vv
-
-            dfact = 0.5 * g.di
-            for im in (1, 2, 3):
-                g.diff[ie][im] = dfact * g.diff[ie][im] * g.rlen[ie] * rlmin
-
-            for im in (1, 2, 3):
-                for inn in (1, 2):
-                    node = g.intmat[ie][inn]
-                    g.dup[node][im] += 0.5 * g.rlen[ie] * g.du[ie][im] + g.ce[
-                        ie][inn] * g.diff[ie][im]
-
-
 mpoin = 40000
 melem = 80000
 period = 0.0
@@ -440,7 +390,53 @@ for it in range(1, g.ntime + 1):
                 node = g.intmat[ie][inn]
                 dt = min(dt, g.rlen[ie] / g.vmax[node])
     g.dt = g.cour * dt
-    deltau()
+    npoin = g.npoin
+    nelem = g.nelem
+    cbig = 1.0e20
+    csmall = -1.0e20
+
+    for im in (1, 2, 3):
+        for ie in range(1, nelem + 1):
+            g.du[ie][im] = 0.0
+            g.diff[ie][im] = 0.0
+
+    rlmin = cbig
+    rlmax = csmall
+    for ie in range(1, nelem + 1):
+        if g.mrhist[ie][5] == 1 and g.rlen[ie] < rlmin:
+            rlmin = g.rlen[ie]
+        if g.mrhist[ie][5] == 1 and g.rlen[ie] > rlmax:
+            rlmax = g.rlen[ie]
+
+    for im in (1, 2, 3):
+        for ip in range(1, npoin + 1):
+            g.dup[ip][im] = 0.0
+
+    for ie in range(1, nelem + 1):
+        if g.mrhist[ie][5] == 1:
+            for im in (1, 2, 3):
+                du_ie = 0.0
+                for inn in (1, 2):
+                    du_ie += g.ce[ie][inn] * g.flux[g.intmat[ie][inn]][im]
+                g.du[ie][im] = du_ie
+
+            vv = max(g.vmax[g.intmat[ie][1]], g.vmax[g.intmat[ie][2]])
+            g.diff[ie][1] = g.ce[ie][1] * g.rho[g.intmat[ie][1]] * vv + g.ce[
+                ie][2] * g.rho[g.intmat[ie][2]] * vv
+            g.diff[ie][2] = g.ce[ie][1] * g.rhov[g.intmat[ie][1]] * vv + g.ce[
+                ie][2] * g.rhov[g.intmat[ie][2]] * vv
+            g.diff[ie][3] = g.ce[ie][1] * g.rhoE[g.intmat[ie][1]] * vv + g.ce[
+                ie][2] * g.rhoE[g.intmat[ie][2]] * vv
+
+            dfact = 0.5 * g.di
+            for im in (1, 2, 3):
+                g.diff[ie][im] = dfact * g.diff[ie][im] * g.rlen[ie] * rlmin
+
+            for im in (1, 2, 3):
+                for inn in (1, 2):
+                    node = g.intmat[ie][inn]
+                    g.dup[node][im] += 0.5 * g.rlen[ie] * g.du[ie][im] + g.ce[
+                        ie][inn] * g.diff[ie][im]
 
     # BC (non-periodic → zero momentum increments at ends)
     if g.period == 0.0:
