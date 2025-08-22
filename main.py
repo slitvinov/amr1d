@@ -1,104 +1,45 @@
 import math
 
+
 class g:
     pass
+
 
 def fmt_e12_5(x):
     return f"{x: .5E}".rjust(12)
 
+
 def line_5e(vals):
     return "".join("  " + fmt_e12_5(v) for v in vals)
+
 
 def line_5e_i6(vals, iv):
     return line_5e(vals) + f"  {iv:6d}"
 
+
 def fname_from_i(i):
     return f"{i:07d}.dat"
 
+
 def i2d_int(n1, n2):
-    return [[0]*(n2+1) for _ in range(n1+1)]
+    return [[0] * (n2 + 1) for _ in range(n1 + 1)]
+
 
 def i1d_int(n):
-    return [0]*(n+1)
+    return [0] * (n + 1)
+
 
 def r2d(n1, n2):
-    return [[0.0]*(n2+1) for _ in range(n1+1)]
+    return [[0.0] * (n2 + 1) for _ in range(n1 + 1)]
+
 
 def r1d(n):
-    return [0.0]*(n+1)
+    return [0.0] * (n + 1)
 
-def init(fh):
-    g.gamma  = 1.4
-    g.gammal = g.gamma - 1.0
-    g.cour   = 0.5
-    g.ntime  = 3000
-    g.di     = 0.5
-    g.ctore  = 0.25
-    g.ctode  = 0.1
-    g.epsil  = 0.005
-    g.nbuff  = 3
-    g.ntref  = 2
-    g.nrmax  = 3
-    g.npoin  = 128
-    g.nelem  = 127
-
-    npoin  = g.npoin
-    nelem  = g.nelem
-    melem  = g.melem
-    mpoin  = g.mpoin
-    period = g.period
-
-    # connectivity
-    for ie in range(1, npoin):
-        g.intmat[ie][1] = ie
-        g.intmat[ie][2] = ie + 1
-
-    if period != 0.0:
-        g.intmat[nelem][1] = nelem
-        g.intmat[nelem][2] = 1
-    else:
-        g.ibdry_l = 1
-        g.ibdry_r = npoin
-
-    # histories/flags
-    for ie in range(1, melem + 1):
-        for ir in range(1, 6):
-            g.mrhist[ie][ir] = 0
-        g.irefe[ie] = 0
-        g.idere[ie] = 0
-    for ie in range(1, nelem + 1):
-        g.mrhist[ie][5] = 1
-    for ip in range(1, npoin + 1):
-        g.ipact[ip] = 1
-    for ip in range(npoin + 1, mpoin + 1):
-        g.ipact[ip] = 0
-
-    # initial conditions
-    half = npoin // 2
-    for ip in range(1, half + 1):
-        g.rho[ip] = 8.0
-        g.p[ip]   = 10.0
-    for ip in range(half, npoin + 1):
-        g.rho[ip] = 1.0
-        g.p[ip]   = 1.0
-    for ip in range(1, npoin + 1):
-        g.xp[ip]   = float(ip - 1) * 6.4 / float(npoin)
-        g.v[ip]    = 0.0
-        g.rhov[ip] = g.rho[ip] * g.v[ip]
-        g.rhoE[ip] = g.p[ip] / g.gammal + 0.5 * g.rho[ip] * g.v[ip] * g.v[ip]
-
-    # output (keeps the comma as in your current Python)
-    it = 0
-    fh.write("initial conditions\n")
-    fh.write(" it npoin nelem\n")
-    fh.write(f" {it} {npoin},{nelem}\n")
-    fh.write(" xp rho v  rhoE p \n")
-    for i in range(1, npoin + 1):
-        fh.write(line_5e([g.xp[i], g.rho[i], g.v[i], g.rhoE[i], g.p[i]]) + "\n")
 
 def geom():
-    npoin  = g.npoin
-    nelem  = g.nelem
+    npoin = g.npoin
+    nelem = g.nelem
     period = g.period
 
     for ip in range(1, npoin + 1):
@@ -124,6 +65,7 @@ def geom():
         if g.ipact[ip] == 1:
             g.rmatm[ip] = 2.0 / g.rmatm[ip]
 
+
 def grerror(vref):
     nelem = g.nelem
     npoin = g.npoin
@@ -137,8 +79,8 @@ def grerror(vref):
         g.tempea[ie] = 0.0
         g.tempec[ie] = 0.0
         g.errore[ie] = 0.0
-        g.irefe[ie]  = 0
-        g.idere[ie]  = 0
+        g.irefe[ie] = 0
+        g.idere[ie] = 0
     for ip in range(1, mpoin + 1):
         g.temppa[ip] = 0.0
         g.temppb[ip] = 0.0
@@ -163,8 +105,10 @@ def grerror(vref):
             for inn in (1, 2):
                 node = g.intmat[ie][inn]
                 g.temppa[node] += g.rlen[ie] * g.ce[ie][inn] * g.tempea[ie]
-                g.temppb[node] += g.rlen[ie] * abs(g.ce[ie][inn]) * abs(g.tempea[ie])
-                g.temppc[node] += g.rlen[ie] * abs(g.ce[ie][inn]) * g.tempec[ie]
+                g.temppb[node] += g.rlen[ie] * abs(g.ce[ie][inn]) * abs(
+                    g.tempea[ie])
+                g.temppc[node] += g.rlen[ie] * abs(
+                    g.ce[ie][inn]) * g.tempec[ie]
 
     # enforce Dirichlet on endpoints
     g.temppa[ibdry_l] = 0.0
@@ -179,7 +123,8 @@ def grerror(vref):
     # element error, mark refine/derefine
     for ie in range(1, nelem + 1):
         if g.mrhist[ie][5] == 1:
-            g.errore[ie] = max(g.errorp[g.intmat[ie][1]], g.errorp[g.intmat[ie][2]])
+            g.errore[ie] = max(g.errorp[g.intmat[ie][1]],
+                               g.errorp[g.intmat[ie][2]])
             if g.errore[ie] > g.ctore:
                 g.irefe[ie] = 1
             if g.errore[ie] < g.ctode:
@@ -195,7 +140,8 @@ def grerror(vref):
                 g.iptemp[g.intmat[ie][2]] = 1
         for ie in range(1, nelem + 1):
             if g.mrhist[ie][5] == 1:
-                if g.iptemp[g.intmat[ie][1]] == 1 or g.iptemp[g.intmat[ie][2]] == 1:
+                if g.iptemp[g.intmat[ie][1]] == 1 or g.iptemp[g.intmat[ie]
+                                                              [2]] == 1:
                     g.irefe[ie] = 1
 
     # 2:1 balance propagation
@@ -226,6 +172,7 @@ def grerror(vref):
                     if g.ietemp[ie] > g.iptemp[node]:
                         g.iptemp[node] = g.ietemp[ie]
 
+
 def unref():
     nelem = g.nelem
     for ie in range(1, nelem + 1):
@@ -237,15 +184,18 @@ def unref():
                 for inn in (1, 2):
                     ipl = g.intmat[ichild1][inn]
                     ip2 = g.intmat[ichild2][inn]
-                    if ipl != g.intmat[iparent][1] and ipl != g.intmat[iparent][2]:
+                    if ipl != g.intmat[iparent][1] and ipl != g.intmat[
+                            iparent][2]:
                         g.ipact[ipl] = 0
-                    if ip2 != g.intmat[iparent][1] and ip2 != g.intmat[iparent][2]:
+                    if ip2 != g.intmat[iparent][1] and ip2 != g.intmat[
+                            iparent][2]:
                         g.ipact[ip2] = 0
                 g.mrhist[ichild1][5] = 0
                 g.mrhist[ichild2][5] = 0
                 g.mrhist[iparent][5] = 1
                 g.idere[ichild1] = 0
                 g.idere[ichild2] = 0
+
 
 def refine():
     nrmaxl = g.nrmax - 1
@@ -263,10 +213,13 @@ def refine():
 
             # midpoint + averages
             mid = 0.5 * (g.xp[g.intmat[ie][1]] + g.xp[g.intmat[ie][2]])
-            g.xp[npoin]   = mid
-            g.rho[npoin]  = 0.5 * (g.rho[g.intmat[ie][1]]  + g.rho[g.intmat[ie][2]])
-            g.rhov[npoin] = 0.5 * (g.rhov[g.intmat[ie][1]] + g.rhov[g.intmat[ie][2]])
-            g.rhoE[npoin] = 0.5 * (g.rhoE[g.intmat[ie][1]] + g.rhoE[g.intmat[ie][2]])
+            g.xp[npoin] = mid
+            g.rho[npoin] = 0.5 * (g.rho[g.intmat[ie][1]] +
+                                  g.rho[g.intmat[ie][2]])
+            g.rhov[npoin] = 0.5 * (g.rhov[g.intmat[ie][1]] +
+                                   g.rhov[g.intmat[ie][2]])
+            g.rhoE[npoin] = 0.5 * (g.rhoE[g.intmat[ie][1]] +
+                                   g.rhoE[g.intmat[ie][2]])
 
             # split element
             g.intmat[g.nelem + 1][1] = g.intmat[ie][1]
@@ -288,6 +241,7 @@ def refine():
             g.nelem += 2
         ie += 1
 
+
 def fluxld():
     npoin = g.npoin
     nelem = g.nelem
@@ -295,15 +249,16 @@ def fluxld():
 
     for ip in range(1, npoin + 1):
         if g.ipact[ip] == 1:
-            g.v[ip]  = g.rhov[ip] / g.rho[ip]
-            g.p[ip]  = g.gammal * (g.rhoE[ip] - 0.5 * g.rhov[ip] * g.v[ip])
+            g.v[ip] = g.rhov[ip] / g.rho[ip]
+            g.p[ip] = g.gammal * (g.rhoE[ip] - 0.5 * g.rhov[ip] * g.v[ip])
             g.flux[ip][1] = g.rhov[ip]
             g.flux[ip][2] = g.rhov[ip] * g.v[ip] + g.p[ip]
             g.flux[ip][3] = g.rhoE[ip] * g.v[ip] + g.p[ip] * g.v[ip]
 
     for ip in range(1, npoin + 1):
         if g.ipact[ip] == 1:
-            g.vmax[ip] = math.sqrt(g.gamma * g.p[ip] / g.rho[ip]) + abs(g.v[ip])
+            g.vmax[ip] = math.sqrt(g.gamma * g.p[ip] / g.rho[ip]) + abs(
+                g.v[ip])
 
     dt = cbig
     for ie in range(1, nelem + 1):
@@ -313,6 +268,7 @@ def fluxld():
                 dt = min(dt, g.rlen[ie] / g.vmax[node])
     g.dt = g.cour * dt
 
+
 def deltau():
     npoin = g.npoin
     nelem = g.nelem
@@ -321,7 +277,7 @@ def deltau():
 
     for im in (1, 2, 3):
         for ie in range(1, nelem + 1):
-            g.du[ie][im]   = 0.0
+            g.du[ie][im] = 0.0
             g.diff[ie][im] = 0.0
 
     rlmin = cbig
@@ -345,9 +301,12 @@ def deltau():
                 g.du[ie][im] = du_ie
 
             vv = max(g.vmax[g.intmat[ie][1]], g.vmax[g.intmat[ie][2]])
-            g.diff[ie][1] = g.ce[ie][1]*g.rho[g.intmat[ie][1]]*vv + g.ce[ie][2]*g.rho[g.intmat[ie][2]]*vv
-            g.diff[ie][2] = g.ce[ie][1]*g.rhov[g.intmat[ie][1]]*vv + g.ce[ie][2]*g.rhov[g.intmat[ie][2]]*vv
-            g.diff[ie][3] = g.ce[ie][1]*g.rhoE[g.intmat[ie][1]]*vv + g.ce[ie][2]*g.rhoE[g.intmat[ie][2]]*vv
+            g.diff[ie][1] = g.ce[ie][1] * g.rho[g.intmat[ie][1]] * vv + g.ce[
+                ie][2] * g.rho[g.intmat[ie][2]] * vv
+            g.diff[ie][2] = g.ce[ie][1] * g.rhov[g.intmat[ie][1]] * vv + g.ce[
+                ie][2] * g.rhov[g.intmat[ie][2]] * vv
+            g.diff[ie][3] = g.ce[ie][1] * g.rhoE[g.intmat[ie][1]] * vv + g.ce[
+                ie][2] * g.rhoE[g.intmat[ie][2]] * vv
 
             dfact = 0.5 * g.di
             for im in (1, 2, 3):
@@ -356,42 +315,44 @@ def deltau():
             for im in (1, 2, 3):
                 for inn in (1, 2):
                     node = g.intmat[ie][inn]
-                    g.dup[node][im] += 0.5 * g.rlen[ie] * g.du[ie][im] + g.ce[ie][inn] * g.diff[ie][im]
+                    g.dup[node][im] += 0.5 * g.rlen[ie] * g.du[ie][im] + g.ce[
+                        ie][inn] * g.diff[ie][im]
+
 
 mpoin = 40000
 melem = 80000
 period = 0.0
-g.mpoin  = mpoin
-g.melem  = melem
+g.mpoin = mpoin
+g.melem = melem
 g.period = period
 
 # arrays (1-based)
 g.intmat = i2d_int(melem, 2)
-g.ce     = r2d(melem, 2)
-g.rmatm  = r1d(mpoin)
-g.rlen   = r1d(melem)
-g.xp     = r1d(mpoin)
+g.ce = r2d(melem, 2)
+g.rmatm = r1d(mpoin)
+g.rlen = r1d(melem)
+g.xp = r1d(mpoin)
 
-g.rho  = r1d(mpoin)
+g.rho = r1d(mpoin)
 g.rhov = r1d(mpoin)
 g.rhoE = r1d(mpoin)
-g.p    = r1d(mpoin)
-g.v    = r1d(mpoin)
+g.p = r1d(mpoin)
+g.v = r1d(mpoin)
 g.flux = r2d(mpoin, 3)
 
 g.diff = r2d(melem, 3)
 g.vmax = r1d(mpoin)
-g.du   = r2d(melem, 3)
-g.dup  = r2d(mpoin, 3)
+g.du = r2d(melem, 3)
+g.dup = r2d(mpoin, 3)
 
 g.mrhist = i2d_int(melem, 5)
-g.irefe  = i1d_int(melem)
-g.idere  = i1d_int(melem)
-g.ipact  = i1d_int(mpoin)
+g.irefe = i1d_int(melem)
+g.idere = i1d_int(melem)
+g.ipact = i1d_int(mpoin)
 
 g.iptemp = i1d_int(mpoin)
 g.ietemp = i1d_int(melem)
-g.l      = i1d_int(mpoin)
+g.l = i1d_int(mpoin)
 
 g.tempea = r1d(melem)
 g.tempec = r1d(melem)
@@ -401,8 +362,74 @@ g.temppb = r1d(mpoin)
 g.temppc = r1d(mpoin)
 g.errorp = r1d(mpoin)
 
+g.gamma = 1.4
+g.gammal = g.gamma - 1.0
+g.cour = 0.5
+g.ntime = 3000
+g.di = 0.5
+g.ctore = 0.25
+g.ctode = 0.1
+g.epsil = 0.005
+g.nbuff = 3
+g.ntref = 2
+g.nrmax = 3
+g.npoin = 128
+g.nelem = 127
+
+npoin = g.npoin
+nelem = g.nelem
+melem = g.melem
+mpoin = g.mpoin
+period = g.period
+
+# connectivity
+for ie in range(1, npoin):
+    g.intmat[ie][1] = ie
+    g.intmat[ie][2] = ie + 1
+
+if period != 0.0:
+    g.intmat[nelem][1] = nelem
+    g.intmat[nelem][2] = 1
+else:
+    g.ibdry_l = 1
+    g.ibdry_r = npoin
+
+# histories/flags
+for ie in range(1, melem + 1):
+    for ir in range(1, 6):
+        g.mrhist[ie][ir] = 0
+    g.irefe[ie] = 0
+    g.idere[ie] = 0
+for ie in range(1, nelem + 1):
+    g.mrhist[ie][5] = 1
+for ip in range(1, npoin + 1):
+    g.ipact[ip] = 1
+for ip in range(npoin + 1, mpoin + 1):
+    g.ipact[ip] = 0
+
+# initial conditions
+half = npoin // 2
+for ip in range(1, half + 1):
+    g.rho[ip] = 8.0
+    g.p[ip] = 10.0
+for ip in range(half, npoin + 1):
+    g.rho[ip] = 1.0
+    g.p[ip] = 1.0
+for ip in range(1, npoin + 1):
+    g.xp[ip] = float(ip - 1) * 6.4 / float(npoin)
+    g.v[ip] = 0.0
+    g.rhov[ip] = g.rho[ip] * g.v[ip]
+    g.rhoE[ip] = g.p[ip] / g.gammal + 0.5 * g.rho[ip] * g.v[ip] * g.v[ip]
+
+it = 0
 with open(fname_from_i(0), "w") as fh:
-    init(fh)
+    fh.write("initial conditions\n")
+    fh.write(" it npoin nelem\n")
+    fh.write(f" {it} {npoin},{nelem}\n")
+    fh.write(" xp rho v  rhoE p \n")
+    for i in range(1, npoin + 1):
+        fh.write(
+            line_5e([g.xp[i], g.rho[i], g.v[i], g.rhoE[i], g.p[i]]) + "\n")
 
 geom()
 for _ in range(1, 6):
@@ -430,7 +457,7 @@ for it in range(1, g.ntime + 1):
     # conservative update
     for ip in range(1, g.npoin + 1):
         if g.ipact[ip] == 1:
-            g.rho[ip]  -= g.dup[ip][1] * g.rmatm[ip] * g.dt
+            g.rho[ip] -= g.dup[ip][1] * g.rmatm[ip] * g.dt
             g.rhov[ip] -= g.dup[ip][2] * g.rmatm[ip] * g.dt
             g.rhoE[ip] -= g.dup[ip][3] * g.rmatm[ip] * g.dt
             g.p[ip] = g.gammal * (g.rhoE[ip] - 0.5 * g.rhov[ip] * g.v[ip])
@@ -446,12 +473,11 @@ for it in range(1, g.ntime + 1):
                 if g.mrhist[ie][5] == 1:
                     neac += 1
                     g.l[g.intmat[ie][1]] = g.mrhist[ie][4]
-            # keep the comma as in your current Python output
             fh.write(f" {it} {npac} {neac}, {g.npoin} {g.nelem}\n")
             fh.write(" xp rho v  rhoE p l \n")
             for ip in range(1, g.npoin + 1):
                 if g.ipact[ip] == 1:
                     fh.write(
-                        line_5e_i6([g.xp[ip], g.rho[ip], g.v[ip], g.rhoE[ip], g.p[ip]], g.l[ip])
-                        + "\n"
-                    )
+                        line_5e_i6([
+                            g.xp[ip], g.rho[ip], g.v[ip], g.rhoE[ip], g.p[ip]
+                        ], g.l[ip]) + "\n")
