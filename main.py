@@ -410,7 +410,6 @@ def main(mpoin=40000, melem=80000, period=0.0):
     with open(fname_from_i(0), "w") as fh:
         init(fh)
 
-    # pre-sweep: refine/unref 5x with geometry recompute
     geom()
     for _ in range(1, 6):
         grerror(g.rho)
