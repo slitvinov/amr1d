@@ -12,6 +12,12 @@
       integer l(mpoin)
       real tempea(melem),tempec(melem),errore(melem)
       real temppa(mpoin),temppb(mpoin),temppc(mpoin),errorp(mpoin)
+      character*20 fname
+
+      i = 0
+      write(fname,'(I7.7)') i
+      fname = fname(1:7)//'.dat'
+      open(50, file=fname, status='unknown')
 
       call init(gamma,cour,ntime,di,ctore,ctode,epsil,nrmax,
      &     nbuff,ntref,npoin,nelem,mpoin,melem,period,
@@ -76,6 +82,10 @@
          end do
 
          if ( mod(i, 10) .eq. 0 ) then
+            close(50)
+            write(fname,'(I7.7)') i
+            fname = fname(1:7)//'.dat'
+            open(50, file=fname, status='unknown')
             write(50,*)' it,dt = ',i,dt
             write(50,*)' it npoin(active) nelem(active)'
             npac=0
@@ -99,6 +109,7 @@
             end do
          end if
       end do
+      close(50)
  6    format (5(2x, e12.5), 2x, i6)
       end
 
