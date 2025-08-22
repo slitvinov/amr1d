@@ -38,11 +38,10 @@ def r1d(n):
 
 
 def geom():
-    npoin = g.npoin
     nelem = g.nelem
     period = g.period
 
-    for ip in range(1, npoin + 1):
+    for ip in range(1, g.npoin + 1):
         g.rmatm[ip] = 0.0
     for ie in range(1, nelem + 1):
         g.rlen[ie] = 0.0
@@ -61,18 +60,17 @@ def geom():
         if g.mrhist[ie][5] == 1:
             for inn in (1, 2):
                 g.rmatm[g.intmat[ie][inn]] += g.rlen[ie]
-    for ip in range(1, npoin + 1):
+    for ip in range(1, g.npoin + 1):
         if g.ipact[ip] == 1:
             g.rmatm[ip] = 2.0 / g.rmatm[ip]
 
 
 def grerror(vref):
     nelem = g.nelem
-    npoin = g.npoin
     melem = g.melem
     mpoin = g.mpoin
     ibdry_l = getattr(g, "ibdry_l", 1)
-    ibdry_r = getattr(g, "ibdry_r", npoin)
+    ibdry_r = getattr(g, "ibdry_r", g.npoin)
 
     # zero/clear
     for ie in range(1, melem + 1):
@@ -115,7 +113,7 @@ def grerror(vref):
     g.temppa[ibdry_r] = 0.0
 
     # nodal error
-    for ip in range(1, npoin + 1):
+    for ip in range(1, g.npoin + 1):
         if g.ipact[ip] == 1:
             denom = g.temppb[ip] + g.epsil * g.temppc[ip]
             g.errorp[ip] = abs(g.temppa[ip]) / denom if denom != 0.0 else 0.0
@@ -132,7 +130,7 @@ def grerror(vref):
 
     # buffer growth around refine
     for _ in range(1, g.nbuff + 1):
-        for ip in range(1, npoin + 1):
+        for ip in range(1, g.npoin + 1):
             g.iptemp[ip] = 0
         for ie in range(1, nelem + 1):
             if g.mrhist[ie][5] == 1 and g.irefe[ie] == 1:
@@ -150,7 +148,7 @@ def grerror(vref):
             g.ietemp[ie] = 0
             if g.mrhist[ie][5] == 1:
                 g.ietemp[ie] = g.mrhist[ie][4] + g.irefe[ie]
-        for ip in range(1, npoin + 1):
+        for ip in range(1, g.npoin + 1):
             g.iptemp[ip] = 0
         for ie in range(1, nelem + 1):
             if g.mrhist[ie][5] == 1:
@@ -204,27 +202,27 @@ def refine():
         if g.irefe[ie] == 1 and g.mrhist[ie][4] <= nrmaxl:
             g.npoin += 1
             npoin = g.npoin
-            g.ipact[npoin] = 1
-            if npoin > g.mpoin:
-                raise RuntimeError(f"Please increase mpoin. Needed: {npoin}")
+            g.ipact[g.npoin] = 1
+            if g.npoin > g.mpoin:
+                raise RuntimeError(f"Please increase mpoin. Needed: {g.npoin}")
             nelem2 = g.nelem + 2
             if nelem2 > g.melem:
                 raise RuntimeError(f"Please increase melem. Needed: {nelem2}")
 
             # midpoint + averages
             mid = 0.5 * (g.xp[g.intmat[ie][1]] + g.xp[g.intmat[ie][2]])
-            g.xp[npoin] = mid
-            g.rho[npoin] = 0.5 * (g.rho[g.intmat[ie][1]] +
+            g.xp[g.npoin] = mid
+            g.rho[g.npoin] = 0.5 * (g.rho[g.intmat[ie][1]] +
                                   g.rho[g.intmat[ie][2]])
-            g.rhov[npoin] = 0.5 * (g.rhov[g.intmat[ie][1]] +
+            g.rhov[g.npoin] = 0.5 * (g.rhov[g.intmat[ie][1]] +
                                    g.rhov[g.intmat[ie][2]])
-            g.rhoE[npoin] = 0.5 * (g.rhoE[g.intmat[ie][1]] +
+            g.rhoE[g.npoin] = 0.5 * (g.rhoE[g.intmat[ie][1]] +
                                    g.rhoE[g.intmat[ie][2]])
 
             # split element
             g.intmat[g.nelem + 1][1] = g.intmat[ie][1]
-            g.intmat[g.nelem + 1][2] = npoin
-            g.intmat[g.nelem + 2][1] = npoin
+            g.intmat[g.nelem + 1][2] = g.npoin
+            g.intmat[g.nelem + 2][1] = g.npoin
             g.intmat[g.nelem + 2][2] = g.intmat[ie][2]
 
             g.mrhist[ie][5] = 0
@@ -376,14 +374,13 @@ g.nrmax = 3
 g.npoin = 128
 g.nelem = 127
 
-npoin = g.npoin
 nelem = g.nelem
 melem = g.melem
 mpoin = g.mpoin
 period = g.period
 
 # connectivity
-for ie in range(1, npoin):
+for ie in range(1, g.npoin):
     g.intmat[ie][1] = ie
     g.intmat[ie][2] = ie + 1
 
@@ -392,7 +389,7 @@ if period != 0.0:
     g.intmat[nelem][2] = 1
 else:
     g.ibdry_l = 1
-    g.ibdry_r = npoin
+    g.ibdry_r = g.npoin
 
 # histories/flags
 for ie in range(1, melem + 1):
@@ -402,21 +399,21 @@ for ie in range(1, melem + 1):
     g.idere[ie] = 0
 for ie in range(1, nelem + 1):
     g.mrhist[ie][5] = 1
-for ip in range(1, npoin + 1):
+for ip in range(1, g.npoin + 1):
     g.ipact[ip] = 1
-for ip in range(npoin + 1, mpoin + 1):
+for ip in range(g.npoin + 1, mpoin + 1):
     g.ipact[ip] = 0
 
 # initial conditions
-half = npoin // 2
+half = g.npoin // 2
 for ip in range(1, half + 1):
     g.rho[ip] = 8.0
     g.p[ip] = 10.0
-for ip in range(half, npoin + 1):
+for ip in range(half, g.npoin + 1):
     g.rho[ip] = 1.0
     g.p[ip] = 1.0
-for ip in range(1, npoin + 1):
-    g.xp[ip] = float(ip - 1) * 6.4 / float(npoin)
+for ip in range(1, g.npoin + 1):
+    g.xp[ip] = float(ip - 1) * 6.4 / float(g.npoin)
     g.v[ip] = 0.0
     g.rhov[ip] = g.rho[ip] * g.v[ip]
     g.rhoE[ip] = g.p[ip] / g.gammal + 0.5 * g.rho[ip] * g.v[ip] * g.v[ip]
@@ -425,9 +422,9 @@ it = 0
 with open(fname_from_i(0), "w") as fh:
     fh.write("initial conditions\n")
     fh.write(" it npoin nelem\n")
-    fh.write(f" {it} {npoin},{nelem}\n")
+    fh.write(f" {it} {g.npoin},{nelem}\n")
     fh.write(" xp rho v  rhoE p \n")
-    for i in range(1, npoin + 1):
+    for i in range(1, g.npoin + 1):
         fh.write(
             line_5e([g.xp[i], g.rho[i], g.v[i], g.rhoE[i], g.p[i]]) + "\n")
 
