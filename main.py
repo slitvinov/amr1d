@@ -1,4 +1,3 @@
-# main.py
 import math
 
 class g:
@@ -359,108 +358,100 @@ def deltau():
                     node = g.intmat[ie][inn]
                     g.dup[node][im] += 0.5 * g.rlen[ie] * g.du[ie][im] + g.ce[ie][inn] * g.diff[ie][im]
 
-# ----------------------------
-# Driver
-# ----------------------------
-def allocate(mpoin=40000, melem=80000, period=0.0):
-    g.mpoin  = mpoin
-    g.melem  = melem
-    g.period = period
+mpoin = 40000
+melem = 80000
+period = 0.0
+g.mpoin  = mpoin
+g.melem  = melem
+g.period = period
 
-    # arrays (1-based)
-    g.intmat = i2d_int(melem, 2)
-    g.ce     = r2d(melem, 2)
-    g.rmatm  = r1d(mpoin)
-    g.rlen   = r1d(melem)
-    g.xp     = r1d(mpoin)
+# arrays (1-based)
+g.intmat = i2d_int(melem, 2)
+g.ce     = r2d(melem, 2)
+g.rmatm  = r1d(mpoin)
+g.rlen   = r1d(melem)
+g.xp     = r1d(mpoin)
 
-    g.rho  = r1d(mpoin)
-    g.rhov = r1d(mpoin)
-    g.rhoE = r1d(mpoin)
-    g.p    = r1d(mpoin)
-    g.v    = r1d(mpoin)
-    g.flux = r2d(mpoin, 3)
+g.rho  = r1d(mpoin)
+g.rhov = r1d(mpoin)
+g.rhoE = r1d(mpoin)
+g.p    = r1d(mpoin)
+g.v    = r1d(mpoin)
+g.flux = r2d(mpoin, 3)
 
-    g.diff = r2d(melem, 3)
-    g.vmax = r1d(mpoin)
-    g.du   = r2d(melem, 3)
-    g.dup  = r2d(mpoin, 3)
+g.diff = r2d(melem, 3)
+g.vmax = r1d(mpoin)
+g.du   = r2d(melem, 3)
+g.dup  = r2d(mpoin, 3)
 
-    g.mrhist = i2d_int(melem, 5)
-    g.irefe  = i1d_int(melem)
-    g.idere  = i1d_int(melem)
-    g.ipact  = i1d_int(mpoin)
+g.mrhist = i2d_int(melem, 5)
+g.irefe  = i1d_int(melem)
+g.idere  = i1d_int(melem)
+g.ipact  = i1d_int(mpoin)
 
-    g.iptemp = i1d_int(mpoin)
-    g.ietemp = i1d_int(melem)
-    g.l      = i1d_int(mpoin)
+g.iptemp = i1d_int(mpoin)
+g.ietemp = i1d_int(melem)
+g.l      = i1d_int(mpoin)
 
-    g.tempea = r1d(melem)
-    g.tempec = r1d(melem)
-    g.errore = r1d(melem)
-    g.temppa = r1d(mpoin)
-    g.temppb = r1d(mpoin)
-    g.temppc = r1d(mpoin)
-    g.errorp = r1d(mpoin)
+g.tempea = r1d(melem)
+g.tempec = r1d(melem)
+g.errore = r1d(melem)
+g.temppa = r1d(mpoin)
+g.temppb = r1d(mpoin)
+g.temppc = r1d(mpoin)
+g.errorp = r1d(mpoin)
 
-def main(mpoin=40000, melem=80000, period=0.0):
-    allocate(mpoin, melem, period)
+with open(fname_from_i(0), "w") as fh:
+    init(fh)
 
-    # output 0000000.dat
-    with open(fname_from_i(0), "w") as fh:
-        init(fh)
-
+geom()
+for _ in range(1, 6):
+    grerror(g.rho)
+    unref()
+    refine()
     geom()
-    for _ in range(1, 6):
+
+# time loop
+for it in range(1, g.ntime + 1):
+    if it % g.ntref == 0:
         grerror(g.rho)
         unref()
         refine()
         geom()
 
-    # time loop
-    for it in range(1, g.ntime + 1):
-        if it % g.ntref == 0:
-            grerror(g.rho)
-            unref()
-            refine()
-            geom()
+    fluxld()
+    deltau()
 
-        fluxld()
-        deltau()
+    # BC (non-periodic → zero momentum increments at ends)
+    if g.period == 0.0:
+        g.dup[g.ibdry_l][2] = 0.0
+        g.dup[g.ibdry_r][2] = 0.0
 
-        # BC (non-periodic → zero momentum increments at ends)
-        if g.period == 0.0:
-            g.dup[g.ibdry_l][2] = 0.0
-            g.dup[g.ibdry_r][2] = 0.0
+    # conservative update
+    for ip in range(1, g.npoin + 1):
+        if g.ipact[ip] == 1:
+            g.rho[ip]  -= g.dup[ip][1] * g.rmatm[ip] * g.dt
+            g.rhov[ip] -= g.dup[ip][2] * g.rmatm[ip] * g.dt
+            g.rhoE[ip] -= g.dup[ip][3] * g.rmatm[ip] * g.dt
+            g.p[ip] = g.gammal * (g.rhoE[ip] - 0.5 * g.rhov[ip] * g.v[ip])
 
-        # conservative update
-        for ip in range(1, g.npoin + 1):
-            if g.ipact[ip] == 1:
-                g.rho[ip]  -= g.dup[ip][1] * g.rmatm[ip] * g.dt
-                g.rhov[ip] -= g.dup[ip][2] * g.rmatm[ip] * g.dt
-                g.rhoE[ip] -= g.dup[ip][3] * g.rmatm[ip] * g.dt
-                g.p[ip] = g.gammal * (g.rhoE[ip] - 0.5 * g.rhov[ip] * g.v[ip])
-
-        if it % 10 == 0:
-            fname = fname_from_i(it)
-            with open(fname, "w") as fh:
-                fh.write(f" it,dt = {it},{g.dt}\n")
-                fh.write(" it npoin(active) nelem(active)\n")
-                npac = sum(1 for ip in range(1, g.mpoin + 1) if g.ipact[ip] == 1)
-                neac = 0
-                for ie in range(1, g.melem + 1):
-                    if g.mrhist[ie][5] == 1:
-                        neac += 1
-                        g.l[g.intmat[ie][1]] = g.mrhist[ie][4]
-                # keep the comma as in your current Python output
-                fh.write(f" {it} {npac} {neac}, {g.npoin} {g.nelem}\n")
-                fh.write(" xp rho v  rhoE p l \n")
-                for ip in range(1, g.npoin + 1):
-                    if g.ipact[ip] == 1:
-                        fh.write(
-                            line_5e_i6([g.xp[ip], g.rho[ip], g.v[ip], g.rhoE[ip], g.p[ip]], g.l[ip])
-                            + "\n"
-                        )
-
-if __name__ == "__main__":
-    main()
+    if it % 10 == 0:
+        fname = fname_from_i(it)
+        with open(fname, "w") as fh:
+            fh.write(f" it,dt = {it},{g.dt}\n")
+            fh.write(" it npoin(active) nelem(active)\n")
+            npac = sum(1 for ip in range(1, g.mpoin + 1) if g.ipact[ip] == 1)
+            neac = 0
+            for ie in range(1, g.melem + 1):
+                if g.mrhist[ie][5] == 1:
+                    neac += 1
+                    g.l[g.intmat[ie][1]] = g.mrhist[ie][4]
+            # keep the comma as in your current Python output
+            fh.write(f" {it} {npac} {neac}, {g.npoin} {g.nelem}\n")
+            fh.write(" xp rho v  rhoE p l \n")
+            for ip in range(1, g.npoin + 1):
+                if g.ipact[ip] == 1:
+                    fh.write(
+                        line_5e_i6([g.xp[ip], g.rho[ip], g.v[ip], g.rhoE[ip], g.p[ip]], g.l[ip])
+                        + "\n"
+                    )
