@@ -12,6 +12,11 @@ or
 python main.py
 ```
 
+Post-processes
+```
+gnuplot plot.gp
+```
+
 # Results
 
 See Figure 1 in [1]
