@@ -227,9 +227,6 @@ def refine():
 mpoin = 40000
 melem = 80000
 period = 0.0
-g.mpoin = mpoin
-g.melem = melem
-g.period = period
 
 # arrays (1-based)
 g.intmat = i2d_int(melem, 2)
