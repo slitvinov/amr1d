@@ -437,4 +437,6 @@ for it in range(1, g.ntime + 1):
                     g.l[g.intmat[ie][1]] = g.mrhist[ie][4]
             for ip in range(1, g.npoin + 1):
                 if g.ipact[ip] == 1:
-                    fh.write(f"{g.xp[ip]:.16e} {g.rho[ip]:.16e} {g.v[ip]:.16e} {g.rhoE[ip]:.16e} {g.p[ip]:.16e} {g.l[ip]}\n")
+                    fh.write(
+                        f"{g.xp[ip]:.16e} {g.rho[ip]:.16e} {g.v[ip]:.16e} {g.rhoE[ip]:.16e} {g.p[ip]:.16e} {g.l[ip]}\n"
+                    )
