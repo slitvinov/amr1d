@@ -5,10 +5,6 @@ class g:
     pass
 
 
-def fname_from_i(i):
-    return f"{i:07d}.dat"
-
-
 def i2d_int(n1, n2):
     return [[0] * (n2 + 1) for _ in range(n1 + 1)]
 
@@ -431,7 +427,7 @@ for it in range(1, g.ntime + 1):
             g.p[ip] = g.gammal * (g.rhoE[ip] - 0.5 * g.rhov[ip] * g.v[ip])
 
     if it % 10 == 0:
-        fname = fname_from_i(it)
+        fname = f"{it:07d}.dat"
         with open(fname, "w") as fh:
             npac = sum(1 for ip in range(1, g.mpoin + 1) if g.ipact[ip] == 1)
             neac = 0
