@@ -5,18 +5,6 @@ class g:
     pass
 
 
-def fmt_e12_5(x):
-    return f"{x: .5E}".rjust(12)
-
-
-def line_5e(vals):
-    return "".join("  " + fmt_e12_5(v) for v in vals)
-
-
-def line_5e_i6(vals, iv):
-    return line_5e(vals) + f"  {iv:6d}"
-
-
 def fname_from_i(i):
     return f"{i:07d}.dat"
 
@@ -286,7 +274,7 @@ g.errorp = r1d(mpoin)
 g.gamma = 1.4
 g.gammal = g.gamma - 1.0
 g.cour = 0.5
-g.ntime = 3000
+g.ntime = 500
 g.di = 0.5
 g.ctore = 0.25
 g.ctode = 0.1
@@ -342,15 +330,6 @@ for ip in range(1, g.npoin + 1):
     g.rhoE[ip] = g.p[ip] / g.gammal + 0.5 * g.rho[ip] * g.v[ip] * g.v[ip]
 
 it = 0
-with open(fname_from_i(0), "w") as fh:
-    fh.write("initial conditions\n")
-    fh.write(" it npoin nelem\n")
-    fh.write(f" {it} {g.npoin},{nelem}\n")
-    fh.write(" xp rho v  rhoE p \n")
-    for i in range(1, g.npoin + 1):
-        fh.write(
-            line_5e([g.xp[i], g.rho[i], g.v[i], g.rhoE[i], g.p[i]]) + "\n")
-
 geom()
 for _ in range(1, 6):
     grerror(g.rho)
@@ -454,19 +433,12 @@ for it in range(1, g.ntime + 1):
     if it % 10 == 0:
         fname = fname_from_i(it)
         with open(fname, "w") as fh:
-            fh.write(f" it,dt = {it},{g.dt}\n")
-            fh.write(" it npoin(active) nelem(active)\n")
             npac = sum(1 for ip in range(1, g.mpoin + 1) if g.ipact[ip] == 1)
             neac = 0
             for ie in range(1, g.melem + 1):
                 if g.mrhist[ie][5] == 1:
                     neac += 1
                     g.l[g.intmat[ie][1]] = g.mrhist[ie][4]
-            fh.write(f" {it} {npac} {neac}, {g.npoin} {g.nelem}\n")
-            fh.write(" xp rho v  rhoE p l \n")
             for ip in range(1, g.npoin + 1):
                 if g.ipact[ip] == 1:
-                    fh.write(
-                        line_5e_i6([
-                            g.xp[ip], g.rho[ip], g.v[ip], g.rhoE[ip], g.p[ip]
-                        ], g.l[ip]) + "\n")
+                    fh.write(f"{g.xp[ip]:.16e} {g.rho[ip]:.16e} {g.v[ip]:.16e} {g.rhoE[ip]:.16e} {g.p[ip]:.16e} {g.l[ip]}\n")
