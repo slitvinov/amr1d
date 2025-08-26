@@ -125,7 +125,7 @@
       gamma= 1.4
       gammal=gamma-1.
       cour =0.5
-      ntime=3000
+      ntime=500
       di =0.5
       ctore=.25
       ctode = .1
