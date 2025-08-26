@@ -66,11 +66,9 @@ F = len(h)
 g = qmf(h)
 rh = h[::-1]
 rg = g[::-1]
-nc = 20
 
 n = len(x)
 wav = []
-
 a = x
 while True:
     if n == 1:

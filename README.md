@@ -34,3 +34,4 @@ See Figure 1 in [1]
 1. A User's Guide to AMR1D: An Instructional Adaptive Mesh Refinement
   Code for Unstructured Grids
 
+2. http://basilisk.fr/src/examples/wavelet.c
