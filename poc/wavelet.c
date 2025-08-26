@@ -15,10 +15,6 @@ int main()
   periodic (right);
   size (2);
   scalar s[], w[], s2[];
-#if 0
-  for (scalar i in {s,w,s2})
-    i.refine = i.prolongation = refine_biquadratic;
-#endif
   foreach()
     s[] = sin(2.*pi*x) + 0.4*sin(15*pi*x)*max(sin(2.*pi*x), 0);
   wavelet (s, w);
