@@ -6,6 +6,12 @@
 gfortran main.f
 ./a.out
 ```
+
+Post-processes
+```
+gnuplot plot0.gp
+```
+
 or
 
 ```
