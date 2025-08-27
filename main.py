@@ -5,11 +5,11 @@ class g:
     pass
 
 
-def i2d_int(n1, n2):
+def i2d(n1, n2):
     return [[0] * (n2 + 1) for _ in range(n1 + 1)]
 
 
-def i1d_int(n):
+def i1d(n):
     return [0] * (n + 1)
 
 
@@ -213,7 +213,7 @@ g.mpoin = 40000
 g.melem = 80000
 
 # arrays (1-based)
-g.intmat = i2d_int(g.melem, 2)
+g.intmat = i2d(g.melem, 2)
 g.ce = r2d(g.melem, 2)
 g.rmatm = r1d(g.mpoin)
 g.rlen = r1d(g.melem)
@@ -231,14 +231,14 @@ g.vmax = r1d(g.mpoin)
 g.du = r2d(g.melem, 3)
 g.dup = r2d(g.mpoin, 3)
 
-g.mrhist = i2d_int(g.melem, 5)
-g.irefe = i1d_int(g.melem)
-g.idere = i1d_int(g.melem)
-g.ipact = i1d_int(g.mpoin)
+g.mrhist = i2d(g.melem, 5)
+g.irefe = i1d(g.melem)
+g.idere = i1d(g.melem)
+g.ipact = i1d(g.mpoin)
 
-g.iptemp = i1d_int(g.mpoin)
-g.ietemp = i1d_int(g.melem)
-g.l = i1d_int(g.mpoin)
+g.iptemp = i1d(g.mpoin)
+g.ietemp = i1d(g.melem)
+g.l = i1d(g.mpoin)
 
 g.tempea = r1d(g.melem)
 g.tempec = r1d(g.melem)
