@@ -267,11 +267,6 @@ for ie in range(1, g.npoin):
     g.intmat[ie][1] = ie
     g.intmat[ie][2] = ie + 1
 
-for ie in range(1, g.melem + 1):
-    for ir in range(1, 6):
-        g.mrhist[ie][ir] = 0
-    g.irefe[ie] = 0
-    g.idere[ie] = 0
 for ie in range(1, g.nelem + 1):
     g.mrhist[ie][5] = 1
 for ip in range(1, g.npoin + 1):
