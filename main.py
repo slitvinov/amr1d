@@ -231,10 +231,10 @@ g.vmax = r1d(g.mpoin)
 g.du = r2d(g.melem, 3)
 g.dup = r2d(g.mpoin, 3)
 
-g.mrhist = i2d(g.melem, 5) # parent, child1, child2, level, active (1 = yes)
-g.irefe = i1d(g.melem) # refine
-g.idere = i1d(g.melem) # de-refine
-g.ipact = i1d(g.mpoin) # active
+g.mrhist = i2d(g.melem, 5)  # parent, child1, child2, level, active (1 = yes)
+g.irefe = i1d(g.melem)  # refine
+g.idere = i1d(g.melem)  # de-refine
+g.ipact = i1d(g.mpoin)  # active
 
 g.iptemp = i1d(g.mpoin)
 g.ietemp = i1d(g.melem)
