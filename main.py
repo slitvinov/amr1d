@@ -23,7 +23,6 @@ def r1d(n):
 
 def geom():
     nelem = g.nelem
-    period = g.period
 
     for ip in range(1, g.npoin + 1):
         g.rmatm[ip] = 0.0
@@ -32,10 +31,6 @@ def geom():
     for ie in range(1, nelem + 1):
         if g.mrhist[ie][5] == 1:
             g.rlen[ie] = g.xp[g.intmat[ie][2]] - g.xp[g.intmat[ie][1]]
-    if period != 0.0:
-        for ie in range(1, nelem + 1):
-            if abs(g.rlen[ie]) > period / 2.0:
-                g.rlen[ie] = period + g.rlen[ie]
     for ie in range(1, nelem + 1):
         if g.mrhist[ie][5] == 1:
             g.ce[ie][2] = 1.0 / g.rlen[ie]
@@ -226,10 +221,8 @@ def refine():
 
 mpoin = 40000
 melem = 80000
-period = 0.0
 g.mpoin = mpoin
 g.melem = melem
-g.period = period
 
 # arrays (1-based)
 g.intmat = i2d_int(melem, 2)
@@ -284,19 +277,14 @@ g.nelem = 127
 nelem = g.nelem
 melem = g.melem
 mpoin = g.mpoin
-period = g.period
 
 # connectivity
 for ie in range(1, g.npoin):
     g.intmat[ie][1] = ie
     g.intmat[ie][2] = ie + 1
 
-if period != 0.0:
-    g.intmat[nelem][1] = nelem
-    g.intmat[nelem][2] = 1
-else:
-    g.ibdry_l = 1
-    g.ibdry_r = g.npoin
+g.ibdry_l = 1
+g.ibdry_r = g.npoin
 
 # histories/flags
 for ie in range(1, melem + 1):
@@ -413,12 +401,9 @@ for it in range(1, g.ntime + 1):
                     g.dup[node][im] += 0.5 * g.rlen[ie] * g.du[ie][im] + g.ce[
                         ie][inn] * g.diff[ie][im]
 
-    # BC (non-periodic → zero momentum increments at ends)
-    if g.period == 0.0:
-        g.dup[g.ibdry_l][2] = 0.0
-        g.dup[g.ibdry_r][2] = 0.0
+    g.dup[g.ibdry_l][2] = 0.0
+    g.dup[g.ibdry_r][2] = 0.0
 
-    # conservative update
     for ip in range(1, g.npoin + 1):
         if g.ipact[ip] == 1:
             g.rho[ip] -= g.dup[ip][1] * g.rmatm[ip] * g.dt
