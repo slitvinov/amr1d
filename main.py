@@ -258,7 +258,7 @@ g.ctode = 0.1
 g.epsil = 0.005
 g.nbuff = 3
 g.ntref = 2
-g.nrmax = 3
+g.nrmax = 5
 g.npoin = 128
 g.nelem = 127
 
