@@ -1,14 +1,17 @@
 #include "grid/bitree.h"
 void write_level(scalar *list, const char *name) {
-  FILE *fp = fopen(name, "w");
-  for (int l = 0; l <= depth(); l++)
+  char path[FILENAME_MAX];
+  for (int l = 0; l <= depth(); l++) {
+    sprintf(path, "%s.%d", name, l);
+    FILE *fp = fopen(path, "w");
     foreach_level(l, serial) {
       fprintf(fp, "%d %.16e ", l, x);
       for (scalar s in list)
         fprintf(fp, "%.16e ", s[]);
       fputc('\n', fp);
     }
-  fclose(fp);
+    fclose(fp);
+  }
 }
 int main() {
   init_grid(128);

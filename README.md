@@ -35,3 +35,4 @@ See Figure 1 in [1]
   Code for Unstructured Grids
 
 2. http://basilisk.fr/src/examples/wavelet.c
+3. http://basilisk.fr/sandbox/Antoonvh/The_adaptive_wavelet_algirthm
