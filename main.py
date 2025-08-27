@@ -43,7 +43,6 @@ def geom():
 
 
 def grerror(vref):
-    # zero/clear
     for ie in range(1, g.melem + 1):
         g.tempea[ie] = 0.0
         g.tempec[ie] = 0.0
@@ -177,7 +176,6 @@ def refine():
             nelem2 = g.nelem + 2
             if nelem2 > g.melem:
                 raise RuntimeError(f"Please increase melem. Needed: {nelem2}")
-
             # midpoint + averages
             mid = 0.5 * (g.xp[g.intmat[ie][1]] + g.xp[g.intmat[ie][2]])
             g.xp[g.npoin] = mid
