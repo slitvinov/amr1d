@@ -229,8 +229,8 @@ def refine():
         ie += 1
 
 
-g.mpoin = 40000
-g.melem = 80000
+g.mpoin = 40000 * 2
+g.melem = 80000 * 2
 
 # arrays (1-based)
 g.intmat = i2d(g.melem, 2)
