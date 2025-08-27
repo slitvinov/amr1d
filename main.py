@@ -219,46 +219,44 @@ def refine():
         ie += 1
 
 
-mpoin = 40000
-melem = 80000
-g.mpoin = mpoin
-g.melem = melem
+g.mpoin = 40000
+g.melem = 80000
 
 # arrays (1-based)
-g.intmat = i2d_int(melem, 2)
-g.ce = r2d(melem, 2)
-g.rmatm = r1d(mpoin)
-g.rlen = r1d(melem)
-g.xp = r1d(mpoin)
+g.intmat = i2d_int(g.melem, 2)
+g.ce = r2d(g.melem, 2)
+g.rmatm = r1d(g.mpoin)
+g.rlen = r1d(g.melem)
+g.xp = r1d(g.mpoin)
 
-g.rho = r1d(mpoin)
-g.rhov = r1d(mpoin)
-g.rhoE = r1d(mpoin)
-g.p = r1d(mpoin)
-g.v = r1d(mpoin)
-g.flux = r2d(mpoin, 3)
+g.rho = r1d(g.mpoin)
+g.rhov = r1d(g.mpoin)
+g.rhoE = r1d(g.mpoin)
+g.p = r1d(g.mpoin)
+g.v = r1d(g.mpoin)
+g.flux = r2d(g.mpoin, 3)
 
-g.diff = r2d(melem, 3)
-g.vmax = r1d(mpoin)
-g.du = r2d(melem, 3)
-g.dup = r2d(mpoin, 3)
+g.diff = r2d(g.melem, 3)
+g.vmax = r1d(g.mpoin)
+g.du = r2d(g.melem, 3)
+g.dup = r2d(g.mpoin, 3)
 
-g.mrhist = i2d_int(melem, 5)
-g.irefe = i1d_int(melem)
-g.idere = i1d_int(melem)
-g.ipact = i1d_int(mpoin)
+g.mrhist = i2d_int(g.melem, 5)
+g.irefe = i1d_int(g.melem)
+g.idere = i1d_int(g.melem)
+g.ipact = i1d_int(g.mpoin)
 
-g.iptemp = i1d_int(mpoin)
-g.ietemp = i1d_int(melem)
-g.l = i1d_int(mpoin)
+g.iptemp = i1d_int(g.mpoin)
+g.ietemp = i1d_int(g.melem)
+g.l = i1d_int(g.mpoin)
 
-g.tempea = r1d(melem)
-g.tempec = r1d(melem)
-g.errore = r1d(melem)
-g.temppa = r1d(mpoin)
-g.temppb = r1d(mpoin)
-g.temppc = r1d(mpoin)
-g.errorp = r1d(mpoin)
+g.tempea = r1d(g.melem)
+g.tempec = r1d(g.melem)
+g.errore = r1d(g.melem)
+g.temppa = r1d(g.mpoin)
+g.temppb = r1d(g.mpoin)
+g.temppc = r1d(g.mpoin)
+g.errorp = r1d(g.mpoin)
 
 g.gamma = 1.4
 g.gammal = g.gamma - 1.0
@@ -275,8 +273,8 @@ g.npoin = 128
 g.nelem = 127
 
 nelem = g.nelem
-melem = g.melem
-mpoin = g.mpoin
+# melem = g.melem
+# mpoin = g.mpoin
 
 # connectivity
 for ie in range(1, g.npoin):
@@ -286,8 +284,7 @@ for ie in range(1, g.npoin):
 g.ibdry_l = 1
 g.ibdry_r = g.npoin
 
-# histories/flags
-for ie in range(1, melem + 1):
+for ie in range(1, g.melem + 1):
     for ir in range(1, 6):
         g.mrhist[ie][ir] = 0
     g.irefe[ie] = 0
@@ -296,7 +293,7 @@ for ie in range(1, nelem + 1):
     g.mrhist[ie][5] = 1
 for ip in range(1, g.npoin + 1):
     g.ipact[ip] = 1
-for ip in range(g.npoin + 1, mpoin + 1):
+for ip in range(g.npoin + 1, g.mpoin + 1):
     g.ipact[ip] = 0
 
 # initial conditions
