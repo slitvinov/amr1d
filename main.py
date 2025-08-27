@@ -271,8 +271,6 @@ for ie in range(1, g.nelem + 1):
     g.mrhist[ie][5] = 1
 for ip in range(1, g.npoin + 1):
     g.ipact[ip] = 1
-for ip in range(g.npoin + 1, g.mpoin + 1):
-    g.ipact[ip] = 0
 
 # initial conditions
 half = g.npoin // 2
