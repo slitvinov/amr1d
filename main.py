@@ -281,7 +281,7 @@ for ip in range(half, g.npoin + 1):
     g.rho[ip] = 1.0
     g.p[ip] = 1.0
 for ip in range(1, g.npoin + 1):
-    g.xp[ip] = float(ip - 1) * 6.4 / float(g.npoin)
+    g.xp[ip] = (ip - 1) * 6.4 / g.npoin
     g.v[ip] = 0.0
     g.rhov[ip] = g.rho[ip] * g.v[ip]
     g.rhoE[ip] = g.p[ip] / g.gammal + 0.5 * g.rho[ip] * g.v[ip] * g.v[ip]
