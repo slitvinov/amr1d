@@ -22,20 +22,18 @@ def r1d(n):
 
 
 def geom():
-    nelem = g.nelem
-
     for ip in range(1, g.npoin + 1):
         g.rmatm[ip] = 0.0
-    for ie in range(1, nelem + 1):
+    for ie in range(1, g.nelem + 1):
         g.rlen[ie] = 0.0
-    for ie in range(1, nelem + 1):
+    for ie in range(1, g.nelem + 1):
         if g.mrhist[ie][5] == 1:
             g.rlen[ie] = g.xp[g.intmat[ie][2]] - g.xp[g.intmat[ie][1]]
-    for ie in range(1, nelem + 1):
+    for ie in range(1, g.nelem + 1):
         if g.mrhist[ie][5] == 1:
             g.ce[ie][2] = 1.0 / g.rlen[ie]
             g.ce[ie][1] = -g.ce[ie][2]
-    for ie in range(1, nelem + 1):
+    for ie in range(1, g.nelem + 1):
         if g.mrhist[ie][5] == 1:
             for inn in (1, 2):
                 g.rmatm[g.intmat[ie][inn]] += g.rlen[ie]
@@ -45,7 +43,6 @@ def geom():
 
 
 def grerror(vref):
-    nelem = g.nelem
     melem = g.melem
     mpoin = g.mpoin
     ibdry_l = g.ibdry_l
@@ -65,7 +62,7 @@ def grerror(vref):
         g.errorp[ip] = 0.0
 
     # element gradients
-    for ie in range(1, nelem + 1):
+    for ie in range(1, g.nelem + 1):
         if g.mrhist[ie][5] == 1:
             acc_a = 0.0
             acc_c = 0.0
@@ -77,7 +74,7 @@ def grerror(vref):
             g.tempec[ie] = acc_c
 
     # assemble nodal metrics
-    for ie in range(1, nelem + 1):
+    for ie in range(1, g.nelem + 1):
         if g.mrhist[ie][5] == 1:
             for inn in (1, 2):
                 node = g.intmat[ie][inn]
@@ -98,7 +95,7 @@ def grerror(vref):
             g.errorp[ip] = abs(g.temppa[ip]) / denom if denom != 0.0 else 0.0
 
     # element error, mark refine/derefine
-    for ie in range(1, nelem + 1):
+    for ie in range(1, g.nelem + 1):
         if g.mrhist[ie][5] == 1:
             g.errore[ie] = max(g.errorp[g.intmat[ie][1]],
                                g.errorp[g.intmat[ie][2]])
@@ -111,11 +108,11 @@ def grerror(vref):
     for _ in range(1, g.nbuff + 1):
         for ip in range(1, g.npoin + 1):
             g.iptemp[ip] = 0
-        for ie in range(1, nelem + 1):
+        for ie in range(1, g.nelem + 1):
             if g.mrhist[ie][5] == 1 and g.irefe[ie] == 1:
                 g.iptemp[g.intmat[ie][1]] = 1
                 g.iptemp[g.intmat[ie][2]] = 1
-        for ie in range(1, nelem + 1):
+        for ie in range(1, g.nelem + 1):
             if g.mrhist[ie][5] == 1:
                 if g.iptemp[g.intmat[ie][1]] == 1 or g.iptemp[g.intmat[ie]
                                                               [2]] == 1:
@@ -123,19 +120,19 @@ def grerror(vref):
 
     # 2:1 balance propagation
     for _ in range(1, 6):
-        for ie in range(1, nelem + 1):
+        for ie in range(1, g.nelem + 1):
             g.ietemp[ie] = 0
             if g.mrhist[ie][5] == 1:
                 g.ietemp[ie] = g.mrhist[ie][4] + g.irefe[ie]
         for ip in range(1, g.npoin + 1):
             g.iptemp[ip] = 0
-        for ie in range(1, nelem + 1):
+        for ie in range(1, g.nelem + 1):
             if g.mrhist[ie][5] == 1:
                 for inn in (1, 2):
                     node = g.intmat[ie][inn]
                     if g.ietemp[ie] > g.iptemp[node]:
                         g.iptemp[node] = g.ietemp[ie]
-        for ie in range(1, nelem + 1):
+        for ie in range(1, g.nelem + 1):
             if g.mrhist[ie][5] == 1:
                 for inn in (1, 2):
                     node = g.intmat[ie][inn]
@@ -151,8 +148,7 @@ def grerror(vref):
 
 
 def unref():
-    nelem = g.nelem
-    for ie in range(1, nelem + 1):
+    for ie in range(1, g.nelem + 1):
         if g.idere[ie] == 1 and g.mrhist[ie][4] != 0:
             iparent = g.mrhist[ie][1]
             ichild1 = g.mrhist[iparent][2]
@@ -180,7 +176,6 @@ def refine():
     while ie <= g.nelem:
         if g.irefe[ie] == 1 and g.mrhist[ie][4] <= nrmaxl:
             g.npoin += 1
-            npoin = g.npoin
             g.ipact[g.npoin] = 1
             if g.npoin > g.mpoin:
                 raise RuntimeError(f"Please increase mpoin. Needed: {g.npoin}")
@@ -272,10 +267,6 @@ g.nrmax = 3
 g.npoin = 128
 g.nelem = 127
 
-nelem = g.nelem
-# melem = g.melem
-# mpoin = g.mpoin
-
 # connectivity
 for ie in range(1, g.npoin):
     g.intmat[ie][1] = ie
@@ -289,7 +280,7 @@ for ie in range(1, g.melem + 1):
         g.mrhist[ie][ir] = 0
     g.irefe[ie] = 0
     g.idere[ie] = 0
-for ie in range(1, nelem + 1):
+for ie in range(1, g.nelem + 1):
     g.mrhist[ie][5] = 1
 for ip in range(1, g.npoin + 1):
     g.ipact[ip] = 1
@@ -326,11 +317,8 @@ for it in range(1, g.ntime + 1):
         refine()
         geom()
 
-    npoin = g.npoin
-    nelem = g.nelem
     cbig = 1.0e30
-
-    for ip in range(1, npoin + 1):
+    for ip in range(1, g.npoin + 1):
         if g.ipact[ip] == 1:
             g.v[ip] = g.rhov[ip] / g.rho[ip]
             g.p[ip] = g.gammal * (g.rhoE[ip] - 0.5 * g.rhov[ip] * g.v[ip])
@@ -338,41 +326,39 @@ for it in range(1, g.ntime + 1):
             g.flux[ip][2] = g.rhov[ip] * g.v[ip] + g.p[ip]
             g.flux[ip][3] = g.rhoE[ip] * g.v[ip] + g.p[ip] * g.v[ip]
 
-    for ip in range(1, npoin + 1):
+    for ip in range(1, g.npoin + 1):
         if g.ipact[ip] == 1:
             g.vmax[ip] = math.sqrt(g.gamma * g.p[ip] / g.rho[ip]) + abs(
                 g.v[ip])
 
     dt = cbig
-    for ie in range(1, nelem + 1):
+    for ie in range(1, g.nelem + 1):
         if g.mrhist[ie][5] == 1:
             for inn in (1, 2):
                 node = g.intmat[ie][inn]
                 dt = min(dt, g.rlen[ie] / g.vmax[node])
     g.dt = g.cour * dt
-    npoin = g.npoin
-    nelem = g.nelem
     cbig = 1.0e20
     csmall = -1.0e20
 
     for im in (1, 2, 3):
-        for ie in range(1, nelem + 1):
+        for ie in range(1, g.nelem + 1):
             g.du[ie][im] = 0.0
             g.diff[ie][im] = 0.0
 
     rlmin = cbig
     rlmax = csmall
-    for ie in range(1, nelem + 1):
+    for ie in range(1, g.nelem + 1):
         if g.mrhist[ie][5] == 1 and g.rlen[ie] < rlmin:
             rlmin = g.rlen[ie]
         if g.mrhist[ie][5] == 1 and g.rlen[ie] > rlmax:
             rlmax = g.rlen[ie]
 
     for im in (1, 2, 3):
-        for ip in range(1, npoin + 1):
+        for ip in range(1, g.npoin + 1):
             g.dup[ip][im] = 0.0
 
-    for ie in range(1, nelem + 1):
+    for ie in range(1, g.nelem + 1):
         if g.mrhist[ie][5] == 1:
             for im in (1, 2, 3):
                 du_ie = 0.0
