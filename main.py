@@ -43,19 +43,14 @@ def geom():
 
 
 def grerror(vref):
-    melem = g.melem
-    mpoin = g.mpoin
-    ibdry_l = g.ibdry_l
-    ibdry_r = g.ibdry_r
-
     # zero/clear
-    for ie in range(1, melem + 1):
+    for ie in range(1, g.melem + 1):
         g.tempea[ie] = 0.0
         g.tempec[ie] = 0.0
         g.errore[ie] = 0.0
         g.irefe[ie] = 0
         g.idere[ie] = 0
-    for ip in range(1, mpoin + 1):
+    for ip in range(1, g.mpoin + 1):
         g.temppa[ip] = 0.0
         g.temppb[ip] = 0.0
         g.temppc[ip] = 0.0
@@ -85,8 +80,8 @@ def grerror(vref):
                     g.ce[ie][inn]) * g.tempec[ie]
 
     # enforce Dirichlet on endpoints
-    g.temppa[ibdry_l] = 0.0
-    g.temppa[ibdry_r] = 0.0
+    g.temppa[1] = 0.0
+    g.temppa[g.npoin] = 0.0
 
     # nodal error
     for ip in range(1, g.npoin + 1):
@@ -272,9 +267,6 @@ for ie in range(1, g.npoin):
     g.intmat[ie][1] = ie
     g.intmat[ie][2] = ie + 1
 
-g.ibdry_l = 1
-g.ibdry_r = g.npoin
-
 for ie in range(1, g.melem + 1):
     for ir in range(1, 6):
         g.mrhist[ie][ir] = 0
@@ -384,8 +376,8 @@ for it in range(1, g.ntime + 1):
                     g.dup[node][im] += 0.5 * g.rlen[ie] * g.du[ie][im] + g.ce[
                         ie][inn] * g.diff[ie][im]
 
-    g.dup[g.ibdry_l][2] = 0.0
-    g.dup[g.ibdry_r][2] = 0.0
+    g.dup[1][2] = 0.0
+    g.dup[g.npoin][2] = 0.0
 
     for ip in range(1, g.npoin + 1):
         if g.ipact[ip] == 1:
