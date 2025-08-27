@@ -286,7 +286,6 @@ for ip in range(1, g.npoin + 1):
     g.rhov[ip] = g.rho[ip] * g.v[ip]
     g.rhoE[ip] = g.p[ip] / g.gammal + 0.5 * g.rho[ip] * g.v[ip] * g.v[ip]
 
-it = 0
 geom()
 for _ in range(1, 6):
     grerror(g.rho)
@@ -294,7 +293,6 @@ for _ in range(1, 6):
     refine()
     geom()
 
-# time loop
 for it in range(1, g.ntime + 1):
     if it % g.ntref == 0:
         grerror(g.rho)
