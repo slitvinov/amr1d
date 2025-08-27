@@ -3,9 +3,9 @@ void write_level(scalar *list, const char *name) {
   FILE *fp = fopen(name, "w");
   for (int l = 0; l <= depth(); l++)
     foreach_level(l, serial) {
-      fprintf(fp, "%d %g ", l, x);
+      fprintf(fp, "%d %.16e ", l, x);
       for (scalar s in list)
-        fprintf(fp, "%g ", s[]);
+        fprintf(fp, "%.16e ", s[]);
       fputc('\n', fp);
     }
   fclose(fp);
